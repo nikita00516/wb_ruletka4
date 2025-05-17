@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Рулетка WB</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle, #39004d, #1e0033);
+      font-family: Arial, sans-serif;
+      color: #fff;
+      text-align: center;
+    }
+    .container {
+      padding-top: 40px;
+    }
+    .wheel-wrapper {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 0 auto;
+    }
+    .wheel {
+      position: absolute;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      margin: auto;
+      border-radius: 50%;
+      border: 6px solid #ff00c3;
+      background: white;
+      overflow: hidden;
+    }
+    .wheel.level2 {
+      width: 220px;
+      height: 220px;
+      top: 40px; left: 40px;
+      border-width: 5px;
+    }
+    .wheel.level3 {
+      width: 140px;
+      height: 140px;
+      top: 80px; left: 80px;
+      border-width: 4px;
+    }
+    .segment {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      top: 50%;
+      left: 50%;
+      transform-origin: 0% 0%;
+      background: #ff44d0;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      clip-path: polygon(0% 0%, 100% 0%, 0% 100%);
+    }
+    .pointer {
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-bottom: 25px solid red;
+      margin: 0 auto 10px;
+    }
+    .btn {
+      margin-top: 30px;
+      padding: 12px 25px;
+      font-size: 18px;
+      background: #ff00c3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="pointer"></div>
+    <div class="wheel-wrapper">
+      <div id="wheel1" class="wheel level1"></div>
+      <div id="wheel2" class="wheel level2"></div>
+      <div id="wheel3" class="wheel level3"></div>
+    </div>
+    <button class="btn" onclick="startSpin()">Крутить</button>
+  </div>
+
+  <script>
+    const wheels = [
+      {
+        el: document.getElementById('wheel1'),
+        segments: [
+          "iPhone 16 Pro", "30000₽", "0₽", "5000₽", "8000₽", "1000₽",
+          "2000₽", "500₽", "0₽", "10000₽", "0₽", "15000₽"
+        ],
+        stopIndex: 2
+      },
+      {
+        el: document.getElementById('wheel2'),
+        segments: [
+          "3000₽", "1000₽", "0₽", "500₽", "0₽", "500₽", "1000₽", "3000₽"
+        ],
+        stopIndex: 2
+      },
+      {
+        el: document.getElementById('wheel3'),
+        segments: [
+          "15000₽", "0₽", "1000₽", "5000₽", "10000₽", "500₽"
+        ],
+        stopIndex: 3
+      }
+    ];
+
+    wheels.forEach(({ el, segments }, index) => {
+      const angle = 360 / segments.length;
+      segments.forEach((text, i) => {
+        const div = document.createElement("div");
+        div.className = "segment";
+        div.innerText = text;
+        div.style.background = `hsl(${i * angle}, 80%, 50%)`;
+        div.style.transform = `rotate(${i * angle}deg) skewY(-60deg)`;
+        el.appendChild(div);
+      });
+    });
+
+    function spinWheel(el, stopIndex, totalSegments, rounds, callback) {
+      const anglePerSegment = 360 / totalSegments;
+      const targetAngle = stopIndex * anglePerSegment + anglePerSegment / 2;
+      const finalAngle = rounds * 360 + targetAngle;
+
+      el.style.transition = 'none';
+      el.style.transform = 'rotate(0deg)';
+
+      requestAnimationFrame(() => {
+        el.style.transition = 'transform 5s ease-out';
+        el.style.transform = `rotate(${finalAngle}deg)`;
+        setTimeout(callback, 5200);
+      });
+    }
+
+    function startSpin() {
+      spinWheel(wheels[0].el, wheels[0].stopIndex, wheels[0].segments.length, 5, () => {
+        spinWheel(wheels[1].el, wheels[1].stopIndex, wheels[1].segments.length, 5, () => {
+          spinWheel(wheels[2].el, wheels[2].stopIndex, wheels[2].segments.length, 5, () => {
+            alert('Поздравляем! Вы выиграли 5000₽');
+          });
+        });
+      });
+    }
+  </script>
+</body>
+</html>
